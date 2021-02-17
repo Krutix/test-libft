@@ -1,111 +1,80 @@
-#include "./eval-libft/libft.h"
-#include "print_output.h"
+#include "ftst.h"
+#include <stdlib.h>
+//#include "../eval-libft/libft.h"
 
 char	test(unsigned int i, char c)
 {
 	return c + (i % 2);
 }
 
-int		main(void)
+TEST(ft_atoi)
 {
+	EQ(ft_atoi("-------++---42"), 0, d);
+	EQ(ft_atoi("000000000000000000000042"), 42, d, EXPECT, "atoi crutch");
+}
 
-	print_tester_name();
+TEST(ft_strnstr)
+{
+	STR_EQ(ft_strnstr("000000123", "123", 9), "123");
+}
 
-	print_title("ATOI");
-
-	char num[12];
-	sprintf(num, "%d", ft_atoi("000000000000000000000042"));
-	printf("checking atoi crutch ");
-	print_result("42", num);
-	printf("\nchecking basic case ");
-	sprintf(num, "%d", ft_atoi("-------++---42"));
-	print_result("0", num);
-
-
-
-
-	print_title("STRNSTR");
-
-	printf("checking basic case ");
-	print_result("123", ft_strnstr("000000123", "123", 9));
-
-
-
-
-
-
-	print_title("SPLIT");
-
-	printf("checking split with a string containing only delimiters ");
+TEST(ft_split)
+{
 	char **splited;
+	char *description;
+
+	description = "checking split with a string containing only delimiters | expected array of pointers with one element pointing to NULL";
 	splited = ft_split("    ", ' ');
-	if (splited == NULL)
-		print_result("\033[31m:( expected array of pointers with one element pointing to NULL\033[0m", "(null)");
-	else
-		print_result("(null)", *splited);
+	NE(splited, NULL, p, EXPECT, description);
+	if (splited) EQ(*splited, NULL, p, EXPECT, description);
 
-	printf("\nchecking split with empty string ");
+	description = "checking split with empty string | expected array of pointers with one element pointing to NULL";
 	splited = ft_split("", ' ');
-	if (splited == NULL)
-		print_result("\033[31m :( expected array of pointers with one element pointing to NULL\033[0m", "(null)");
-	else
-		print_result("(null)", *splited);
+	NE(splited, NULL, p, EXPECT, description);
+	if (splited) EQ(*splited, NULL, p, EXPECT, description);
 
-	printf("\nchecking split with string and \\0 as delimiter ");
+	description = "checking split with string and \\0 as delimiter";
 	splited = ft_split("Hello, world!", '\0');
-	if (splited == NULL)
-		print_result("Hello, world!", "(null)");
-	else
-		print_result("Hello, world!", *splited);
+	NE(splited, NULL, p EXPECT, description);
+	if (splited) STR_EQ(*splited, "Hello, world!", EXPECT, description);
 
-	printf("\nchecking split with empty string and \\0 as delimiter ");
-	splited = ft_split("", '\0');
-	if (splited == NULL)
-		print_result("\033[31m :( expected array of pointers with one element pointing to NULL\033[0m", "(null)");
-	else
-		print_result("(null)", *splited);
+	description = "checking split with empty string and \\0 as delimiter | expected array of pointers with one element pointing to NULL";
+	splited = ft_split("Hello, world!", '\0');
+	NE(splited, NULL, p EXPECT, description);
+	if (splited) STR_EQ(*splited, NULL, EXPECT, description);
 
+#if FTST_MALLOC_TEST
+	LEAK_RESET();
+	MALLOC_COUNTER_SET(3);
 
+	EQ(ft_split("a b c d", ' '), NULL, s);
 
+	IS_FALSE(LEAKS());
+#endif
+}
 
-	print_title("SUBSTR");
+TEST(ft_substr)
+{
+	char *t;
+	STR_EQ(t = ft_substr("1 2 3... RUN!", 9, 4), "RUN!"); free(t);
+	STR_EQ(t = ft_substr("test", 1, 8), "est"); free(t);
+	STR_EQ(t = ft_substr("HelloCat", 15, 3), "", EXPECT, "expected empty string. it is stupid, but fact :("); free(t);
+}
 
-	printf("checking basic case ");
-	print_result("RUN!", ft_substr("1 2 3... RUN!", 9, 4));
-	printf("\nchecking basic case ");
-	print_result("est", ft_substr("test", 1, 8));
-	printf("\nchecking substr return when index is out of the string ");
-	char *substr_ret;
-	substr_ret = ft_substr("HelloCat", 15, 3);
-	if (substr_ret == NULL)
-		print_result("\033[31mexpected empty string. it is stupid, but fact :( \033[0m", "(null)" );
-	else
-		print_result("", substr_ret);
+TEST(ft_strtrim)
+{
+	char *t;
+	STR_EQ(t = ft_strtrim("", " "), ""); free(t);
+	STR_EQ(t = ft_strtrim("", ""), ""); free(t);
+	STR_EQ(t = ft_strtrim("*@****@**A**A***@*", "*@"), "A**A"); free(t);
+	STR_EQ(t = ft_strtrim("*@****@**A**A***@*", "*@"), "A**A"); free(t);
+	STR_EQ(t = ft_strtrim("*@*..****@**@**....B....***@****..*@***", ".*@"), "B"); free(t);
+	STR_EQ(t = ft_strtrim("*@****@*******@*C", "*@"), "C"); free(t);
+	STR_EQ(t = ft_strtrim("D", "0123456789"), "D"); free(t);
+}
 
-
-
-
-	print_title("STRTRIM");
-
-	printf("checking with str as an empty string ");
-	print_result("", ft_strtrim("", " "));
-	printf("\nchecking with str and set as empty strings ");
-	print_result("", ft_strtrim("", ""));
-	printf("\nchecking basic case ");
-	print_result("A**A", ft_strtrim("*@****@**A**A***@*", "*@"));
-	printf("\nchecking one no-set symbol ");
-	print_result("B", ft_strtrim("*@*..****@**@**....B....***@****..*@***", ".*@"));
-	printf("\nchecking one no-set symbol ");
-	print_result("C", ft_strtrim("*@****@*******@*C", "*@"));
-	printf("\nchecking strlen(set) > strlen(str) ");
-	print_result("D", ft_strtrim("D", "123456789"));
-
-
-
-	print_title("STRMAPI");
-
-	printf("checking with empty string ");
-	print_result("", ft_strmapi("", test));
-
-	printf("\n");
+TEST(ft_strmapi)
+{
+	char *t;
+	STR_EQ(t = ft_strmapi("", test), ""); free(t);
 }
