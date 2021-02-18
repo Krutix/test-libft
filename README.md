@@ -2,7 +2,7 @@
 
 
 ```
-git clone https://github.com/saugustu42/test-libft.git
+git clone --recursive https://github.com/saugustu42/test-libft.git
 ```
 ```
 cd test-libft
