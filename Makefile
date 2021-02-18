@@ -1,9 +1,13 @@
+.DEFAULT_GOAL := all
 NAME = test
 
-LIB_PATH = ./eval-libft
+# libft path
+LIB_PATH = ./eval-libft/
+
+
 LIB = $(LIB_PATH)/libft.a
 
-LIST = main.c print_output.c
+LIST = main.c
 
 OBJ = $(patsubst %.c,%.o,$(LIST))
 
@@ -13,16 +17,24 @@ unit = ./libft-unit-test
 
 cfg = ./cfg/.vimrc
 
-all : $(NAME)
+# ftst #
+include ftst-unit-test-framework/ftst.mk
+FTST_DIR = ftst-unit-test-framework/
+
+########
+
+INC = $(addprefix -I, $(LIB_PATH) ${FTST_INC})
+
+all : run-my-test
 
 $(NAME) : $(LIB) $(OBJ)
-	gcc $(OBJ) -L$(LIB_PATH) -lft -o $(NAME)
+	gcc $(OBJ) -L$(LIB_PATH) -lft -o $(NAME) $(INC)
 
 %.o : %.c
-	gcc -c $< -o $@
+	gcc -c $< -o $@ $(INC)
 
 $(LIB) : NONE
-	$(MAKE) -C $(LIB_PATH)
+	@$(MAKE) -C $(LIB_PATH) -s
 
 clean :
 	rm -f $(OBJ)
@@ -34,8 +46,7 @@ norm :
 	cd $(LIB_PATH) && make clean && norminette .
 
 run-my-test : $(NAME)
-	@echo "\n\n\n"
-	./$(NAME)
+	@./$(NAME)
 
 $(Libftest) :
 	git clone https://github.com/jtoty/Libftest.git
